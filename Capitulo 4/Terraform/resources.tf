@@ -9,7 +9,7 @@ provider "aws" {
 resource "aws_vpc" "terraform-vpc" {
   cidr_block = "${var.vpc-cidr}"
 
-  tags {
+  tags = {
     Name = "${var.vpc-name}"
   }
 }
@@ -27,7 +27,7 @@ resource "aws_route_table" "public" {
     gateway_id = "${aws_internet_gateway.terraform-igw.id}"
   }
 
-  tags {
+  tags = {
     Name = "Public"
   }
 }
@@ -36,10 +36,10 @@ resource "aws_route_table" "public" {
 resource "aws_subnet" "public-1" {
   vpc_id = "${aws_vpc.terraform-vpc.id}"
   cidr_block = "${cidrsubnet(var.vpc-cidr, 8, 1)}"
-  availability_zone = "${element(split(",",var.aws-availability-zones), count.index)}"
+  availability_zone = "${element(split(",",var.aws-availability-zones), 0)}"
   map_public_ip_on_launch = true
 
-  tags {
+  tags = {
     Name = "Public"
   }
 }
@@ -137,7 +137,7 @@ EOF
 
 resource "aws_iam_instance_profile" "jenkins" {
     name = "jenkins"
-    roles = ["${aws_iam_role.jenkins.name}"]
+    role = "${aws_iam_role.jenkins.name}"
 }
 
 resource "aws_instance" "jenkins" {
@@ -147,7 +147,7 @@ resource "aws_instance" "jenkins" {
     vpc_security_group_ids = ["${aws_security_group.jenkins.id}"]
     iam_instance_profile = "${aws_iam_instance_profile.jenkins.id}"
     subnet_id = "${aws_subnet.public-1.id}"
-    tags { Name = "jenkins" }
+    tags = { Name = "jenkins" }
     user_data = <<EOF
 #!/bin/bash
 set -euf -o pipefail

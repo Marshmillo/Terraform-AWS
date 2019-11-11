@@ -1,6 +1,7 @@
 # Set a Provider
 provider "aws" {
   region = "${var.aws-region}"
+
 }
 
 ### VPC ###
@@ -9,7 +10,7 @@ provider "aws" {
 resource "aws_vpc" "terraform-vpc" {
   cidr_block = "${var.vpc-cidr}"
 
-  tags {
+  tags = {
     Name = "${var.vpc-name}"
   }
 }
@@ -38,7 +39,7 @@ resource "aws_route_table" "public" {
     gateway_id = "${aws_internet_gateway.terraform-igw.id}"
   }
 
-  tags {
+  tags = {
     Name = "Public"
   }
 }
@@ -50,7 +51,7 @@ resource "aws_route_table" "private" {
     nat_gateway_id = "${aws_nat_gateway.terraform-nat.id}"
   }
 
-  tags {
+  tags = {
     Name = "Private"
   }
 }
@@ -59,10 +60,10 @@ resource "aws_route_table" "private" {
 resource "aws_subnet" "public-1" {
   vpc_id = "${aws_vpc.terraform-vpc.id}"
   cidr_block = "${cidrsubnet(var.vpc-cidr, 8, 1)}"
-  availability_zone = "${element(split(",",var.aws-availability-zones), count.index)}"
+  availability_zone = "${element(split(",",var.aws-availability-zones), 0)}"
   map_public_ip_on_launch = true
 
-  tags {
+  tags = {
     Name = "Public"
   }
 }
@@ -75,10 +76,10 @@ resource "aws_route_table_association" "public-1" {
 resource "aws_subnet" "public-2" {
   vpc_id = "${aws_vpc.terraform-vpc.id}"
   cidr_block = "${cidrsubnet(var.vpc-cidr, 8, 3)}"
-  availability_zone = "${element(split(",",var.aws-availability-zones), count.index + 1)}"
+  availability_zone = "${element(split(",",var.aws-availability-zones), 1)}"
   map_public_ip_on_launch = true
 
-  tags {
+  tags = {
     Name = "Public"
   }
 }
@@ -92,10 +93,10 @@ resource "aws_route_table_association" "public-2" {
 resource "aws_subnet" "private-1" {
   vpc_id = "${aws_vpc.terraform-vpc.id}"
   cidr_block = "${cidrsubnet(var.vpc-cidr, 8, 2)}"
-  availability_zone = "${element(split(",",var.aws-availability-zones), count.index)}"
+  availability_zone = "${element(split(",",var.aws-availability-zones), 0)}"
   map_public_ip_on_launch = false
 
-  tags {
+  tags = {
     Name = "Private"
   }
 }
@@ -108,10 +109,10 @@ resource "aws_route_table_association" "private-1" {
 resource "aws_subnet" "private-2" {
   vpc_id = "${aws_vpc.terraform-vpc.id}"
   cidr_block = "${cidrsubnet(var.vpc-cidr, 8, 4)}"
-  availability_zone = "${element(split(",",var.aws-availability-zones), count.index + 1)}"
+  availability_zone = "${element(split(",",var.aws-availability-zones),1)}"
   map_public_ip_on_launch = false
 
-  tags {
+  tags = {
     Name = "Private"
   }
 }
@@ -207,7 +208,7 @@ resource "aws_elb" "terraform-elb" {
     lb_protocol = "http"
   }
 
-  tags {
+  tags = {
     Name = "terraform-elb"
   }
 }
