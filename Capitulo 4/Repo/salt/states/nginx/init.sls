@@ -1,21 +1,19 @@
 include:
   - jenkins
 
-nginx:
-  pkg.installed: []
+install_nginx:
+   cmd.run:
+      - name: "sudo amazon-linux-extras install -y nginx1.12"
 
+nginx:
   service.running:
-    - enable: True
-    - reload: True
-    - require:
-      - pkg: nginx
-      - service: jenkins
+     - name: nginx
+     - enable: True
+     - reload: True
 
 /etc/nginx/conf.d/jenkins.conf:
   file.managed:
     - source: salt://nginx/files/jenkins.conf
-    - require:
-      - pkg: nginx
     - require_in:
       - service: nginx
     - watch_in:
@@ -27,8 +25,6 @@ nginx:
     - makedirs: True
     - mode: 400
     - contents_pillar: nginx:{{ FIL }}
-    - require:
-      - pkg: nginx
     - require_in:
       - service: nginx
     - watch_in:

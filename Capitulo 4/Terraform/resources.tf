@@ -154,18 +154,18 @@ set -euf -o pipefail
 exec 1> >(logger -s -t $(basename $0)) 2>&1
 # Install Git and set CodeComit connection settings
 # (required for access via IAM roles)
-yum -y install git
-git config --system credential.helper '!aws codecommit credential-helper $@'
-git config --system credential.UseHttpPath true
+sudo yum -y install git
+#git config --system credential.helper '!aws codecommit credential-helper $@'
+#git config --system credential.UseHttpPath true
 # Clone the Salt repository
-git clone https://git-codecommit.us-east-1.amazonaws.com/v1/repos/salt /srv/salt; chmod 700 /srv/salt
+git clone https://github.com/Marshmillo/salt.git /srv/salt; sudo chmod 777 /srv/salt
 # Install SaltStack
-yum -y install https://repo.saltstack.com/yum/amazon/salt-amzn-repo-latest-1.ami.noarch.rpm
-yum clean expire-cache; yum -y install salt-minion; chkconfig salt-minion off
+sudo yum -y install https://repo.saltstack.com/yum/redhat/salt-repo-latest.el7.noarch.rpm
+sudo yum clean expire-cache; sudo yum -y install salt-minion; chkconfig salt-minion off
 # Put custom minion config in place (for enabling masterless mode)
-cp -r /srv/salt/minion.d /etc/salt/
+sudo cp -r /srv/salt/minion.d /etc/salt/
 ## Trigger a full Salt run
-salt-call state.apply
+sudo salt-call state.apply
 EOF
 
     lifecycle { create_before_destroy = true }
